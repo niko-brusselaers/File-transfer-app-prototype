@@ -29,7 +29,6 @@ function webSocketService(webSocketPort) {
                 })
                 console.log("user already exists", user);
             } else {
-                const userIds = users.map(u => u.id);
                 const userNames = users.map(u => u.name);
                 socket.emit("login",{
                     message: "Login successful",
@@ -37,7 +36,7 @@ function webSocketService(webSocketPort) {
                     users: userNames,
                 
                 })
-                socket.to(userIds).emit("user-connected", {
+                socket.broadcast.emit("user-connected", {
                     message: "User connected",
                     name: user.name,
                 })
@@ -60,8 +59,12 @@ function webSocketService(webSocketPort) {
             const user = users.find(u => u.id === socket.id);
             if (user) {
                 users.splice(users.indexOf(user), 1);
+                socket.broadcast.emit("user-disconnected", {
+                    message: "User disconnected",
+                    name: user.name,
+                })
+                console.log("user disconnected", user);
             }
-            console.log("user disconnected", user);
         });
     });
 
