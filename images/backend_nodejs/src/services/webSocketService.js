@@ -23,18 +23,26 @@ function webSocketService(webSocketPort) {
             }
             // check if user already exists
             if (users.find(u => u.name === user.name)) {
-                socket.to(socket.id).emit("user-exists", {
-                    message: "User already connected",
-                    status: 401
+                socket.emit("login",{
+                    message: "User already exists",
+                    status: 400,
                 })
+                console.log("user already exists", user);
             } else {
+                socket.emit("login",{
+                    message: "Login successful",
+                    status: 200,
+                
+                })
                 socket.emit("user-connected", {
                     message: "User connected",
-                    status: 200
+                    status: 200,
+                    name: user.name
                 })
+                users.push(user);
+                console.log("user connected", user);
+
             }
-            users.push(user);
-            console.log("user connected", user);
         })
 
         socket.on("send-request", (data) => {
