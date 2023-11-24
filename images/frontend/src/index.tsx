@@ -4,6 +4,7 @@ import './index.css';
 import {createBrowserRouter,RouterProvider } from "react-router-dom"
 import Root from './Root';
 import UploadPage from './core/pages/uploadpage/UploadPage';
+import WebRTCTransferPage from './core/pages/WebRTCTransferPage/WebRTCTransferPage';
 
 const router = createBrowserRouter([
   {
@@ -13,6 +14,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <UploadPage/>
+      },
+      {
+        path: "/webrtc-transfer",
+        element: <WebRTCTransferPage/>
       }
     
 
