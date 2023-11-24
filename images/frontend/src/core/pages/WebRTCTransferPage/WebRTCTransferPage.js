@@ -16,6 +16,11 @@ function WebRTCTransferPage() {
        }
     });
 
+    socket.on('user-disconnected', (data) => {
+        console.log(data);
+        setUsers(users.filter((user) => user !== data.name));
+    });
+
 
     return ( 
         <div>
