@@ -29,15 +29,17 @@ function webSocketService(webSocketPort) {
                 })
                 console.log("user already exists", user);
             } else {
+                const userIds = users.map(u => u.id);
+                const userNames = users.map(u => u.name);
                 socket.emit("login",{
                     message: "Login successful",
                     status: 200,
+                    users: userNames,
                 
                 })
-                socket.emit("user-connected", {
+                socket.to(userIds).emit("user-connected", {
                     message: "User connected",
-                    status: 200,
-                    name: user.name
+                    name: user.name,
                 })
                 users.push(user);
                 console.log("user connected", user);
