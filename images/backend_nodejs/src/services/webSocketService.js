@@ -1,6 +1,9 @@
 import { Server } from "socket.io"
 import { createServer } from "http"
+
+
 const server = createServer()
+const users = [];
 function webSocketService(webSocketPort) {
 
     const io = new Server(server, {
@@ -12,9 +15,26 @@ function webSocketService(webSocketPort) {
 
     io.on("connection", (socket) => {
 
-        socket.on("connect", (data) => {
-            // TODO: save user to user list
-
+        socket.on("login", (data) => {
+            // save user to user list
+            const user = {
+                id: socket.id,
+                name: data.name,
+            }
+            // check if user already exists
+            if (users.find(u => u.name === user.name)) {
+                socket.to(socket.id).emit("user-exists", {
+                    message: "User already connected",
+                    status: 401
+                })
+            } else {
+                socket.emit("user-connected", {
+                    message: "User connected",
+                    status: 200
+                })
+            }
+            users.push(user);
+            console.log("user connected", user);
         })
 
         socket.on("send-request", (data) => {
@@ -25,8 +45,13 @@ function webSocketService(webSocketPort) {
             // TODO: send response to original sender of file that the other user accepted or rejected the file request
         });
 
-        socket.on("disconnect", () => {
-            console.log("user disconnected");
+        socket.on("disconnect", (data) => {
+            // remove user from user list
+            const user = users.find(u => u.id === socket.id);
+            if (user) {
+                users.splice(users.indexOf(user), 1);
+            }
+            console.log("user disconnected", user);
         });
     });
 
