@@ -38,7 +38,7 @@ function webSocketService(webSocketPort) {
                 })
                 socket.broadcast.emit("user-connected", {
                     message: "User connected",
-                    name: user.name,
+                    users: [...userNames, user.name],
                 })
                 users.push(user);
                 console.log("user connected", user);
