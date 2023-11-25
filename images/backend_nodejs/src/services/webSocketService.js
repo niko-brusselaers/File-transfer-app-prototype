@@ -23,22 +23,22 @@ function webSocketService(webSocketPort) {
             }
             // check if user already exists
             if (users.find(u => u.name === user.name)) {
-                socket.emit("login", {
+                socket.emit("login",{
                     message: "User already exists",
                     status: 400,
                 })
                 console.log("user already exists", user);
             } else {
                 const userNames = users.map(u => u.name);
-                socket.emit("login", {
+                socket.emit("login",{
                     message: "Login successful",
                     status: 200,
                     users: userNames,
-
+                
                 })
                 socket.broadcast.emit("user-connected", {
                     message: "User connected",
-                    name: user.name,
+                    users: [...userNames, user.name],
                 })
                 users.push(user);
                 console.log("user connected", user);
@@ -48,10 +48,45 @@ function webSocketService(webSocketPort) {
 
         socket.on("send-request", (data) => {
             // TODO: send file request to to the other user
+            let receiver = users.find(u => u.name === data.receiver);
+            if (receiver) {
+                socket.to(receiver.id).emit("send-request", {
+                    sender: data.sender,
+                    filename: data.filename,
+                    filesize: data.filesize,
+                    signal: data.offer,
+                    status: 200,
+
+                });
+            } else {
+                socket.emit("send-request", {
+                    message: "User not found",
+                    status: 404,
+                })
+            }
         });
 
         socket.on("send-response", (data) => {
             // TODO: send response to original sender of file that the other user accepted or rejected the file request
+            let receiver = users.find(u => u.name === data.receiver);
+            if (receiver) {
+                if (data.accepted) {
+                    socket.to(receiver.id).emit("send-response", {
+                        signal: data.signal,
+                        status: 200,
+                    });
+                } else {
+                    socket.to(receiver.id).emit("send-response", {
+                        message: "User rejected file request",
+                        status: 400,
+                    });
+                }
+            } else {
+                socket.emit("send-response", {
+                    message: "User not found",
+                    status: 404,
+                })
+            }
         });
 
         socket.on("disconnect", (data) => {
