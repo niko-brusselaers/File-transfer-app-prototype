@@ -54,7 +54,7 @@ function webSocketService(webSocketPort) {
                     sender: data.sender,
                     filename: data.filename,
                     filesize: data.filesize,
-                    offer: data.offer,
+                    signal: data.offer,
                     status: 200,
 
                 });
@@ -68,6 +68,25 @@ function webSocketService(webSocketPort) {
 
         socket.on("send-response", (data) => {
             // TODO: send response to original sender of file that the other user accepted or rejected the file request
+            let receiver = users.find(u => u.name === data.receiver);
+            if (receiver) {
+                if (data.accepted) {
+                    socket.to(receiver.id).emit("send-response", {
+                        signal: data.signal,
+                        status: 200,
+                    });
+                } else {
+                    socket.to(receiver.id).emit("send-response", {
+                        message: "User rejected file request",
+                        status: 400,
+                    });
+                }
+            } else {
+                socket.emit("send-response", {
+                    message: "User not found",
+                    status: 404,
+                })
+            }
         });
 
         socket.on("disconnect", (data) => {
