@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { Socket } from 'socket.io-client';
+import styles from './login.module.css';
 
-function Login({ socket, setUsername ,setUsers , setErrorMessage }) {
+function Login({ socket, setUsername ,setUsers , setErrorMessage }: { socket: Socket, setUsername: Function, setUsers: Function, setErrorMessage: Function }) {
     
     const [usernameInput, setUsernameInput] = useState('');
 
-    const handleSubmit = (event) => {
+    const handleSubmit = (event:React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         console.log("login");
         socket.emit('login', { name: usernameInput });
@@ -27,7 +29,7 @@ function Login({ socket, setUsername ,setUsers , setErrorMessage }) {
 
 
     return (
-        <div>
+        <div className={styles.loginContainer}>
             <h2>please enter your username</h2>
             
             <form onSubmit={handleSubmit}>
