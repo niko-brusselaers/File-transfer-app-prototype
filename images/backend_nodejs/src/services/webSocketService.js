@@ -48,6 +48,22 @@ function webSocketService(webSocketPort) {
 
         socket.on("send-request", (data) => {
             // TODO: send file request to to the other user
+            let receiver = users.find(u => u.name === data.receiver);
+            if (receiver) {
+                socket.to(receiver.id).emit("send-request", {
+                    sender: data.sender,
+                    filename: data.filename,
+                    filesize: data.filesize,
+                    offer: data.offer,
+                    status: 200,
+
+                });
+            } else {
+                socket.emit("send-request", {
+                    message: "User not found",
+                    status: 404,
+                })
+            }
         });
 
         socket.on("send-response", (data) => {
