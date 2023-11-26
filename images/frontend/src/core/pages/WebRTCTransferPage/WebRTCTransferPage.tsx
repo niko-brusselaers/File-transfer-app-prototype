@@ -4,6 +4,8 @@ import Login from "./components/Login/login";
 import UserProfile from "./components/UserProfile/userProfile";
 import styles from './WebRTCTransferPage.module.css';
 import TransferFileModal from "./components/modal/TransferFileModal";
+import SimplePeer from 'simple-peer';
+
 const socket = io('http://localhost:4001');
 
 function WebRTCTransferPage() {
@@ -12,6 +14,7 @@ function WebRTCTransferPage() {
     const [users, setUsers] = useState<string[]>([]);
     const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
     const [receiverName, setReceiverName] = useState<string|undefined>(undefined);
+    const peerRef = useRef<SimplePeer.Instance| undefined>(undefined);
 
     socket.on('user-connected', (data: {
     message: string;
@@ -33,6 +36,11 @@ function WebRTCTransferPage() {
         
     }
 
+    function setPeerRef(peer: SimplePeer.Instance) {
+        peerRef.current = peer;
+    }
+    
+
     return ( 
         <div className={styles.WebRTCTransferContainer}>
             {errorMessage ? <p className={styles.errorMessage}>{errorMessage}</p> : null}
@@ -41,7 +49,7 @@ function WebRTCTransferPage() {
             <div className={username ? undefined : styles.userListHidden}>
                 {users ? users.map((user, index) => <UserProfile name={user} sendFileRequest={sendFileRequest} key={index}/>) : null}
             </div>
-            {modalIsOpen ? <TransferFileModal ModalIsOpen={setModalIsOpen} socket={socket} name={receiverName} /> : null}
+            {modalIsOpen ? <TransferFileModal ModalIsOpen={setModalIsOpen} socket={socket} name={receiverName} setPeerRef={setPeerRef} username={username!} /> : null}
         </div>
      );
 }

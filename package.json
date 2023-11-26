@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@types/simple-peer": "^9.11.8",
+    "simple-peer": "^9.11.1"
+  }
+}
