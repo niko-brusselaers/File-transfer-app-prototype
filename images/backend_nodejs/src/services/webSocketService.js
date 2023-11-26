@@ -52,9 +52,9 @@ function webSocketService(webSocketPort) {
             if (receiver) {
                 socket.to(receiver.id).emit("send-request", {
                     sender: data.sender,
-                    filename: data.filename,
-                    filesize: data.filesize,
-                    signal: data.offer,
+                    filename: data.fileName,
+                    filesize: data.fileSize,
+                    signal: data.signalData,
                     status: 200,
 
                 });
@@ -67,12 +67,13 @@ function webSocketService(webSocketPort) {
         });
 
         socket.on("send-response", (data) => {
+            console.log("send-response", data);
             // TODO: send response to original sender of file that the other user accepted or rejected the file request
             let receiver = users.find(u => u.name === data.receiver);
             if (receiver) {
                 if (data.accepted) {
                     socket.to(receiver.id).emit("send-response", {
-                        signal: data.signal,
+                        signal: data.signalData,
                         status: 200,
                     });
                 } else {

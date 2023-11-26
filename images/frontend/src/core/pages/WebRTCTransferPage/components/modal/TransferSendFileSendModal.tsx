@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import styles from './TransferFileModal.module.css';
 import "./TransferFileModal.module.css"
 import { Socket } from 'socket.io-client';
 import SimplePeer from 'simple-peer'; 
 
 
-function TransferFileModal({ModalIsOpen,socket, username, setPeerRef,name}: {ModalIsOpen: Function,socket:Socket, setPeerRef:Function,username:string, name:string|undefined}  ) {
+function TransferSendFileModal({ModalIsOpen,socket, username, setPeerRef,name}: {ModalIsOpen: Function,socket:Socket, setPeerRef:Function,username:string, name:string|undefined}  ) {
     const [selectedFile, setSelectedFile] = useState<Blob|null>(null);
     const [fileName, setFileName] = useState<string|undefined>(undefined);
     const [fileSize, setFileSize] = useState<string|undefined>(undefined);
+    const peerRef = useRef<SimplePeer.Instance|undefined>()
 
     function handleFileChange(event:any ) {
         setSelectedFile(event.target.files[0]);
@@ -20,9 +21,7 @@ function TransferFileModal({ModalIsOpen,socket, username, setPeerRef,name}: {Mod
         if (selectedFile) {
             const peer = new SimplePeer({ initiator: true, trickle: false });
 
-            peer.on('signal', (data:any) => {
-                console.log('signal!');
-                
+            peer.on('signal', (data:any) => {                
                 socket.emit('send-request', {
                     sender: username,
                     receiver: name,
@@ -30,19 +29,34 @@ function TransferFileModal({ModalIsOpen,socket, username, setPeerRef,name}: {Mod
                     fileSize: fileSize,
                     signalData: data,
                  });
-                console.log('peer:', peer);
-                setPeerRef(peer);
+                peerRef.current = peer;
                 
             });
 
-            socket.on('send-response', (data:{signalData:SimplePeer.SignalData, status:number}) => {
+            peer.on('error', (error) => {console.error(error)} );
+
+            peer.on('end', (error:any) => {console.error("closing")} );
+
+
+            socket.on('send-response', (data:{signal:SimplePeer.SignalData, status:number}) => {
+                console.log(data);
+                
                 if (data.status === 200) {
-                    sendFile(peer)
+                    try {
+                        console.log(data.signal);
                         
+                        peer.signal(data.signal);
+                        sendFile(peer);
+
+                    } catch (error) {
+                        console.log(error);
                         
+                    }
+                    
+                     
                 } else {
                     console.log('other user rejected file transfer');
-                    peer.destroy();
+
                 }
             })
 
@@ -53,24 +67,31 @@ function TransferFileModal({ModalIsOpen,socket, username, setPeerRef,name}: {Mod
         }
     }
 
-    function sendFile(peer: SimplePeer.Instance) {
-        const stream = selectedFile!.stream();
+    function sendFile(peer:SimplePeer.Instance) {
+        if (!selectedFile) return;
+        const stream = selectedFile.stream();
         const reader = stream.getReader();
 
-        reader.read().then(data => {
-            handleReading(data.done, data.value!)
-            console.log('data:', data.done, data.value);
-        })
+        reader.read().then((obj:any) => {
+            handlereading(obj.done, obj.value);
+        });
 
-        function handleReading(done: boolean, value: Uint8Array) {
-            if(done){
+        function handlereading(done:any, value:any) {
+            if (done) {
                 peer.write(JSON.stringify({ done: true, fileName: fileName }));
+                return;
             }
-
+            console.log('sending data:', value);
+            
             peer.write(value);
-            reader.read().then(data => handleReading(data.done, data.value!));
+                reader.read().then((obj: any) => {
+                    handlereading(obj.done, obj.value);
+                });
         }
+        
+
     }
+
 
     function removeFile() {
         setSelectedFile(null);
@@ -119,4 +140,4 @@ function TransferFileModal({ModalIsOpen,socket, username, setPeerRef,name}: {Mod
     );
 }
 
-export default TransferFileModal;
+export default TransferSendFileModal;

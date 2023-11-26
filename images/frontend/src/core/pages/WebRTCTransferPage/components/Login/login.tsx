@@ -6,7 +6,7 @@ function Login({ socket, setUsername ,setUsers , setErrorMessage }: { socket: So
     
     const [usernameInput, setUsernameInput] = useState('');
 
-    const handleSubmit = (event:React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (event:React.FormEvent) => {
         event.preventDefault();
         console.log("login");
         socket.emit('login', { name: usernameInput });
