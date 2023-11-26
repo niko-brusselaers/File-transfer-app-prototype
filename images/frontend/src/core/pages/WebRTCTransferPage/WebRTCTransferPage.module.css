@@ -1,8 +1,29 @@
-.WebRTCTransferContainer{
+.WebRTCTransferContainer {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    align-items: center; 
     height: 100vh;
     width: 100vw;
+}
+
+.username {
+    align-self: flex-start;
+    margin-left: 2em;
+    font-size: 30pt;
+    font-weight: 500;
+}
+
+
+.errorMessage{
+    position: absolute;
+    color: white;
+    font-size: 30pt;
+    background-color: rgba(139, 0, 0, 0.68);
+    border-radius: 10px;
+    border: 2px dashed darkred;
+    padding: 2em 3em;
+}
+
+.userListHidden{
+    display: none;
 }

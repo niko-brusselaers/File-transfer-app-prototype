@@ -1,0 +1,118 @@
+.modalOverlay{
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background-color: #202124;
+    opacity: 0.8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modalContainer{
+    width: 30%;
+    height: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #18191b;
+    padding: 2em 3em;
+}
+
+.fileInputContainer{
+    width: 100%;
+    height: 50%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='white' stroke-width='4' stroke-dasharray='6%2c 13' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+}
+
+.fileInputContainer input{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 1;
+    opacity: 0;
+}
+
+.fileInputContainer p{
+    z-index: 0;
+    font-size: 20pt;
+    font-weight: 500;
+    width: 70%;
+    color: white;
+    text-align: center;
+}
+.modalContainer button{
+    width: 25%;
+    height: 4em;
+    font-size: 15pt;
+    margin-top: 1em;
+    border: none;
+    border-radius: 10px;
+    background-color: #54C6EB;
+    color: white;
+    font-weight: 500;
+}
+
+.buttonContainer{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.buttonContainer .sendButton{
+    background-color: #54C6EB;
+}
+
+.buttonContainer .cancelButton{
+    background-color: #eb5e54;
+}
+
+.buttonContainer button:hover.cancelButton{
+    background-color: rgb(212, 77, 68);
+}
+
+.buttonContainer button:hover.sendButton{
+    background-color: #6DCEEE;
+}
+
+.buttonContainer button:disabled.sendButton{
+    background-color: #1AABDB;
+}
+
+.fileDetailsContainer{
+    height: 50%;
+}
+
+.fileDetails{
+    width: 100%;
+    height: 50%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.fileDetailsContainer button{
+    background-color: #eb5e54;
+    width: 100%;
+}
+
+.fileDetailsContainer button:hover{
+    background-color: rgb(212, 77, 68);
+
+}
+
+.horizontalView{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.horizontalView p{
+    margin-left: 1em;
+    height: 1em;
+}

@@ -1,0 +1,16 @@
+.userProfileContainer{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    width: 15em;
+    border-radius: 50px;
+    background-color: #191a1c;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 1em;
+}
+
+.userProfileContainer h1{
+    height: 1.5em;
+}

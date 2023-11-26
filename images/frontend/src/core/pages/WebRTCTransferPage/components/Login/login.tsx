@@ -30,11 +30,11 @@ function Login({ socket, setUsername ,setUsers , setErrorMessage }: { socket: So
 
     return (
         <div className={styles.loginContainer}>
-            <h2>please enter your username</h2>
+            <h2>please choose a username</h2>
             
             <form onSubmit={handleSubmit}>
                 <input type="text" placeholder="Enter your name" onChange={(e) => setUsernameInput(e.target.value)} />
-                <button type="submit">Submit</button>
+                <button type="submit">Save</button>
             </form>
 
         </div>
