@@ -1,0 +1,25 @@
+.downloadContainer{
+    width: 25%;
+    height: 25%;
+    margin: 2em 0;
+
+}
+
+
+.downloadContainer div input{
+    width: 65%;
+    height: 4em;
+    border-radius: 10px;
+    color: white;
+    padding-left: 1em;
+    margin-right: 10%;
+}
+
+.downloadContainer div button{
+    width: 20%;
+    height: 4em;
+}
+
+.downloadContainer .downloadButton{
+    width: 100%;
+}

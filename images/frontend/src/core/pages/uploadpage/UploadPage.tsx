@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
+import styles from './UploadPage.module.css';
 import axios from 'axios';
+import DownloadLink from './components/downloadLink';
 
 const backend_URL = 'http://localhost:4000';
 
 function UploadPage() {
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedFile, setSelectedFile] = useState<Blob|null>(null);
     const [downloadLink, setDownloadLink] = useState(null);
 
 
-    const handleFileChange = (event) => {
+    const handleFileChange = (event:any ) => {
         setSelectedFile(event.target.files[0]);
     };
 
@@ -16,6 +18,9 @@ function UploadPage() {
     })
 
     const handleUpload = async () => {
+        //check if file is selected
+        if (!selectedFile) return;
+        //upload file to backend server
         try {
             const formData = new FormData();
             formData.append('file', selectedFile);
@@ -31,22 +36,22 @@ function UploadPage() {
 
             console.log('File uploaded successfully');
         } catch (error) {
+            // console.log(error);
             console.error('Error uploading file:', error);
         }
     };
 
 
     return (
-        <div>
-            <input type="file" onChange={handleFileChange} />
-            <button onClick={handleUpload}>Upload</button>
+        <div className={styles.uploadPageContainer}>
+            <div className={styles.fileInputContainer}>
+                <p>Please select or drag a file to send</p>
+                <input type="file" onChange={handleFileChange} />
+            </div>
+            <button onClick={handleUpload} disabled={selectedFile ? false : true}>Upload</button>
             {downloadLink ? (
-                <>
-                    <div>
-                        <p>{downloadLink}</p> <button onClick={() => navigator.clipboard.writeText(downloadLink)}>copy</button>
-                    </div>
-                    <a href={downloadLink} download>Download</a>
-                </>) : null}
+                <DownloadLink downloadLink={downloadLink} />
+                ) : null}
         </div>
     );
 };
