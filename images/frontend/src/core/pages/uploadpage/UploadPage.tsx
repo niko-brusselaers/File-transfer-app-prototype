@@ -3,8 +3,7 @@ import styles from './UploadPage.module.css';
 import axios from 'axios';
 import DownloadLink from './components/downloadLink';
 
-const BACKEND_URL = "localhost"
-const backend_Express = `http://${BACKEND_URL}:4000`;
+const backend_Express = `${process.env.REACT_APP_BACKEND_EXPRESS_URL}`;
 
 function UploadPage() {
     const [selectedFile, setSelectedFile] = useState<Blob|null>(null);

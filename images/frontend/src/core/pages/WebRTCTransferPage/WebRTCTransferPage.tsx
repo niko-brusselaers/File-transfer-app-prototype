@@ -12,8 +12,9 @@ import TransferReceiveFileModal from "./components/modal/TransferReceiveFileModa
 (window as any).global = window;
 (window as any).process = process;
 (window as any).Buffer = [];
-const BACKEND_URL = "10.2.89.1"
-const socket = io(`${BACKEND_URL}:4001`);
+
+const socket = io(`${process.env.REACT_APP_BACKEND_WEBSOCKET_URL}`);
+
 
 function WebRTCTransferPage() {
     const [username, setUsername] = useState<string|undefined>(undefined);
