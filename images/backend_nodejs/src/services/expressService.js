@@ -27,9 +27,9 @@ const fileSchema = new mongoose.Schema({
 
 const File = mongoose.model('File', fileSchema);
 
-
+// POST endpoint, upload file to uploads/ directory
 router.post('/upload', upload.single('file'), async (req, res) => {
-    console.log('File uploaded:', req.file);
+    // try to create file in database to store file meta data
     try {
         const fileData = {
             path: req.file.path,
@@ -41,17 +41,20 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
         res.json({ message: 'File uploaded!', downloadUrl });
     } catch (err) {
+        // if error, log error
         console.error('Error uploading file:', err);
     }
 });
 
+// GET endpoint, download file from uploads/ directory
 router.get('/download/:filename', async (req, res) => {
+    // try to find file data from database
     const file = await File.findById(req.params.filename);
-
+    // if file not found, return error
     if (!file) {
         return res.json({ message: 'File not found!' });
     } else {
-        console.log(file.path);
+        // if file found, send file to client        
         res.setHeader('Content-Disposition', `attachment; filename="${file.originalName}"`);
         res.status(200).sendFile(path.resolve(file.path))
     }

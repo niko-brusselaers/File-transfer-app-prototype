@@ -17,10 +17,12 @@ function TransferSendFileModal({ModalIsOpen,socket, username, setPeerRef,name}: 
         setFileSize((event.target.files[0].size / (1024 * 1024)).toFixed(2));        
     };
 
+    // send request to receiver to start file transfer
     function sendRequest() {
+        // check if file is selected
         if (selectedFile) {
             const peer = new SimplePeer({ initiator: true, trickle: false });
-
+            // on signal send request to receiver
             peer.on('signal', (data:any) => {                
                 socket.emit('send-request', {
                     sender: username,
@@ -33,18 +35,21 @@ function TransferSendFileModal({ModalIsOpen,socket, username, setPeerRef,name}: 
                 
             });
 
+            // on peer error log error
             peer.on('error', (error) => {console.error(error)} );
 
-            peer.on('end', (error:any) => {console.error("closing")} );
-
-
-            socket.on('send-response', (data:{signal:SimplePeer.SignalData, status:number}) => {                
+            //when receiving response from receiver check if user accepted or rejected file transfer and start file transfer if accepted
+            socket.on('send-response', (data:{signal:SimplePeer.SignalData, status:number}) => { 
+                // if user accepted file transfer start file transfer               
                 if (data.status === 200) {
                     try {                        
+                        //signal other peer
                         peer.signal(data.signal);
-                            sendFile(peer);
+                        //start file transfer
+                        sendFile(peer);
                             
                     } catch (error) {
+                        // log error
                         console.log(error);
                         
                     }
@@ -63,38 +68,43 @@ function TransferSendFileModal({ModalIsOpen,socket, username, setPeerRef,name}: 
         }
     }
 
+    // send file to receiver
     async function sendFile(peer:SimplePeer.Instance) {
-        const CHUNK_SIZE = 1024 * 256; // Adjust the chunk size as needed
-        const DELAY_MS = 10; // Adjust the delay between chunks as needed
-
+        // max size of chunk send to receiver each time
+        const ChunkSize = 1024 * 256;
+        // check if file is selected
         if (!selectedFile) return;
+        // create stream from selected file
         const stream = selectedFile.stream();
         const reader = stream.getReader();
 
         // Initial trigger to start the reading
         readChunk();
 
+        // read the next chunk of data
         function readChunk() {
             reader.read().then((obj: any) => {
                 handlereading(obj.done, obj.value);
             });
         }
 
+        
         function handlereading(done: any, value: any) {
+            // Check if the transfer is done and send done message to receiver
             if (done) {
                 peer.write(JSON.stringify({ done: true, fileName: fileName }));
                 return;
             }
 
             // Send a chunk of data
-            peer.write(value.slice(0, CHUNK_SIZE));
+            peer.write(value.slice(0, ChunkSize));
 
             // Check if there's more data
-            if (value.length > CHUNK_SIZE) {
+            if (value.length > ChunkSize) {
                 console.log(value.length);
                 
                 // Wait for a short time before sending the next chunk
-                    handlereading(done, value.slice(CHUNK_SIZE));
+                    handlereading(done, value.slice(ChunkSize));
             } else {
                 // Continue reading the next chunk
                 readChunk();
@@ -105,7 +115,7 @@ function TransferSendFileModal({ModalIsOpen,socket, username, setPeerRef,name}: 
 
     }
 
-
+    // remove selected file
     function removeFile() {
         setSelectedFile(null);
         setFileName(undefined);

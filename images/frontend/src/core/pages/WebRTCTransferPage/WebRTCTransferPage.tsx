@@ -27,14 +27,17 @@ function WebRTCTransferPage() {
 
     const peerRef = useRef<SimplePeer.Instance| undefined>(undefined);
 
+    // update userlist when receiving user-connected event
     socket.on('user-connected', (data: IUserConnected) => {
         setUsers(data.users.filter((user: string) => user !== username));
     });
 
+    // update userlist when receiving user-disconnected event
     socket.on('user-disconnected', (data:IUserDisconnected) => {
         setUsers(users.filter((user) => user !== data.name));
     });
 
+    // receive send-request event and open receive modal and set sender data
     socket.on('send-request', (data:any) => {
         console.log('send-request event received:', data);
         setSenderData(data);
@@ -42,12 +45,14 @@ function WebRTCTransferPage() {
 
     })
 
+    // open send modal and set receiver name when clicking on send file button
     function sendFileRequest(name: string) {
         setReceiverName(name);
         setSendModalIsOpen(true);
         
     }
 
+    //function to set peerRef
     function setPeerRef(peer: SimplePeer.Instance) {
         peerRef.current = peer;
     }

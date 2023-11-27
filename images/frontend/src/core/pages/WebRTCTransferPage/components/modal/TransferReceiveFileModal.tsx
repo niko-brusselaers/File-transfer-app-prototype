@@ -13,48 +13,54 @@ function TransferReceiveFileModal({ModalIsOpen,socket, setPeerRef,senderData}: {
     const fileNameRef = useRef<string|undefined>(undefined);
     const [gotFile, setGotFile] = useState<Boolean>(false);
 
-    
+    // function to set send response to sender
     function handleAccept() {
-    const peer = new SimplePeer({ initiator: false, trickle: false });
-
-    peer.on('signal', (data) => {
-        socket.emit('send-response', {
-            receiver: senderData.sender,
-            signalData: data,
-            accepted: true
+        // create new peer
+        const peer = new SimplePeer({ initiator: false, trickle: false });
+        // on signal send response to sender
+        peer.on('signal', (data) => {
+            socket.emit('send-response', {
+                receiver: senderData.sender,
+                signalData: data,
+                accepted: true
+            });
         });
-    });
 
-    peer.on('error', (error) => {console.error(error)} );
+        // on peer error log error
+        peer.on('error', (error) => {console.error(error)} );
 
+        // when receiving data from sender, process data
+        peer.on('data', handleReceivingData);
+        
+        if (senderData.signal) {
+            peer.signal(senderData.signal);
+        } else {
+            console.error('Signal data is missing.');
+        }
 
-    peer.on('data', handleReceivingData);
-
-    if (senderData.signal) {
-        peer.signal(senderData.signal);
-    } else {
-        console.error('Signal data is missing.');
-    }
-
-    peerRef.current = peer;
+        peerRef.current = peer;
 
 }
 
-
+    // function to process data received from sender to a file
     function handleReceivingData(data:any) {
-        
+        //check if data is done and set gotFile to true
         if(data.toString().includes('done')) {
             setGotFile(true)
             const parsed = JSON.parse(data);
             fileNameRef.current = parsed.fileName;
         } else{
+            // send data to worker to process data asynchronisly 
             worker.postMessage(data);
         }
     }
 
+    //function to download file after transfer is done
     function downloadFile() {
         setGotFile(false);
+        // send download message to worker
         worker.postMessage('download');
+        // when receiving message from worker, create filestream and download file
         worker.addEventListener('message', (event) => {            
             const stream = event.data.stream();
             const fileStream= streamSaver.createWriteStream(fileNameRef.current!);
@@ -62,6 +68,7 @@ function TransferReceiveFileModal({ModalIsOpen,socket, setPeerRef,senderData}: {
         });
     }
 
+    // function to send response to sender that file transfer is declined and close modal
     function handleDecline(){
         ModalIsOpen(false)
 

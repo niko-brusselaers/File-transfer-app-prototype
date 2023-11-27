@@ -11,6 +11,7 @@ function UploadPage() {
 
 
     const handleFileChange = (event:any ) => {
+        //update selected file on file change
         setSelectedFile(event.target.files[0]);
     };
 

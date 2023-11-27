@@ -8,7 +8,7 @@ function Login({ socket, setUsername ,setUsers , setErrorMessage }: { socket: So
 
     const handleSubmit = (event:React.FormEvent) => {
         event.preventDefault();
-        console.log("login");
+        //send login event to server
         socket.emit('login', { name: usernameInput });
     };
 
