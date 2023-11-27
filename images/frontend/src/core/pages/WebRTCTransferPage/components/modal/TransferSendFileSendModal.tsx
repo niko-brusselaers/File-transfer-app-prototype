@@ -38,16 +38,12 @@ function TransferSendFileModal({ModalIsOpen,socket, username, setPeerRef,name}: 
             peer.on('end', (error:any) => {console.error("closing")} );
 
 
-            socket.on('send-response', (data:{signal:SimplePeer.SignalData, status:number}) => {
-                console.log(data);
-                
+            socket.on('send-response', (data:{signal:SimplePeer.SignalData, status:number}) => {                
                 if (data.status === 200) {
-                    try {
-                        console.log(data.signal);
-                        
+                    try {                        
                         peer.signal(data.signal);
-                        sendFile(peer);
-
+                            sendFile(peer);
+                            
                     } catch (error) {
                         console.log(error);
                         
@@ -81,7 +77,6 @@ function TransferSendFileModal({ModalIsOpen,socket, username, setPeerRef,name}: 
                 peer.write(JSON.stringify({ done: true, fileName: fileName }));
                 return;
             }
-            console.log('sending data:', value);
             
             peer.write(value);
                 reader.read().then((obj: any) => {

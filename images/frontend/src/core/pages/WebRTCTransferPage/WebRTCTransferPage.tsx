@@ -12,8 +12,8 @@ import TransferReceiveFileModal from "./components/modal/TransferReceiveFileModa
 (window as any).global = window;
 (window as any).process = process;
 (window as any).Buffer = [];
-
-const socket = io('http://192.168.0.17:4001');
+const BACKEND_URL = "10.2.89.1"
+const socket = io(`${BACKEND_URL}:4001`);
 
 function WebRTCTransferPage() {
     const [username, setUsername] = useState<string|undefined>(undefined);

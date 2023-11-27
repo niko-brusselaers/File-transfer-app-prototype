@@ -5,7 +5,15 @@ import path from 'path';
 import dotenv from 'dotenv';
 
 dotenv.config();
-mongoose.connect(process.env.MONGODB_URL);
+const options = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    // Correct write concern format
+    w: 'majority',
+};
+
+mongoose.connect(process.env.MONGODB_URL, options);
+
 
 const upload = multer({ dest: "uploads" })
 const router = express.Router();

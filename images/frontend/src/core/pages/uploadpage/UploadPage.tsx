@@ -3,7 +3,8 @@ import styles from './UploadPage.module.css';
 import axios from 'axios';
 import DownloadLink from './components/downloadLink';
 
-const backend_URL = 'http://localhost:4000';
+const BACKEND_URL = "localhost"
+const backend_Express = `http://${BACKEND_URL}:4000`;
 
 function UploadPage() {
     const [selectedFile, setSelectedFile] = useState<Blob|null>(null);
@@ -25,7 +26,7 @@ function UploadPage() {
             const formData = new FormData();
             formData.append('file', selectedFile);
 
-            await axios.post(`${backend_URL}/upload`, formData, {
+            await axios.post(`${backend_Express}/upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

@@ -2,15 +2,17 @@ import styles from './TransferFileModal.module.css';
 import "./TransferFileModal.module.css"
 import { Socket } from 'socket.io-client';
 import SimplePeer from 'simple-peer'; 
+import streamSaver from 'streamsaver';
 import { ISendRequestOutgoing } from '../../../../shared/models/webSocketInterfaces';
 import { useRef, useState } from 'react';
 
+const worker = new Worker('../worker.js');
 
 function TransferReceiveFileModal({ModalIsOpen,socket, setPeerRef,senderData}: {ModalIsOpen: Function,socket:Socket, setPeerRef:Function,senderData:ISendRequestOutgoing}  ) {    
     const peerRef = useRef<SimplePeer.Instance|undefined>()
     const fileNameRef = useRef<string|undefined>(undefined);
-    const [gotFile, setGotFile] = useState<boolean>(false);
-    const [file, setFile] = useState<Blob|undefined>(undefined);
+    const [gotFile, setGotFile] = useState<Boolean>(false);
+
     
     function handleAccept() {
     const peer = new SimplePeer({ initiator: false, trickle: false });
@@ -25,7 +27,8 @@ function TransferReceiveFileModal({ModalIsOpen,socket, setPeerRef,senderData}: {
 
     peer.on('error', (error) => {console.error(error)} );
 
-    peer.on('data', (data) => {handleReceivingData(data)});
+
+    peer.on('data', handleReceivingData);
 
     if (senderData.signal) {
         peer.signal(senderData.signal);
@@ -39,13 +42,23 @@ function TransferReceiveFileModal({ModalIsOpen,socket, setPeerRef,senderData}: {
 
 
     function handleReceivingData(data:any) {
-        console.log(data);        
-        if (data.toString().includes("done")) {
-            setGotFile(true);
+        if(data.toString().includes('done')) {
+            setGotFile(true)
             const parsed = JSON.parse(data);
             fileNameRef.current = parsed.fileName;
-        } else {
+        } else{
+            worker.postMessage(data);
         }
+    }
+
+    function downloadFile() {
+        setGotFile(false);
+        worker.postMessage('download');
+        worker.addEventListener('message', (event) => {            
+            const stream = event.data.stream();
+            const fileStream= streamSaver.createWriteStream(fileNameRef.current!);
+            stream.pipeTo(fileStream);
+        });
     }
 
     function handleDecline(){
@@ -78,6 +91,7 @@ function TransferReceiveFileModal({ModalIsOpen,socket, setPeerRef,senderData}: {
                                 <h2>File size: </h2>
                                 <p>{senderData.filesize} Mb</p>
                             </div>
+                            {gotFile ? <button onClick={()=> {downloadFile()}}>Download</button> : null}
                         </div>
                     </div> 
                     
@@ -89,5 +103,6 @@ function TransferReceiveFileModal({ModalIsOpen,socket, setPeerRef,senderData}: {
         </div>
     );
 }
+
 
 export default TransferReceiveFileModal;
