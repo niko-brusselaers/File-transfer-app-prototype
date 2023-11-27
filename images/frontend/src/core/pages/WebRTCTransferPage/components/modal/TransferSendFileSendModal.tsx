@@ -63,26 +63,44 @@ function TransferSendFileModal({ModalIsOpen,socket, username, setPeerRef,name}: 
         }
     }
 
-    function sendFile(peer:SimplePeer.Instance) {
+    async function sendFile(peer:SimplePeer.Instance) {
+        const CHUNK_SIZE = 1024 * 256; // Adjust the chunk size as needed
+        const DELAY_MS = 10; // Adjust the delay between chunks as needed
+
         if (!selectedFile) return;
         const stream = selectedFile.stream();
         const reader = stream.getReader();
 
-        reader.read().then((obj:any) => {
-            handlereading(obj.done, obj.value);
-        });
+        // Initial trigger to start the reading
+        readChunk();
 
-        function handlereading(done:any, value:any) {
+        function readChunk() {
+            reader.read().then((obj: any) => {
+                handlereading(obj.done, obj.value);
+            });
+        }
+
+        function handlereading(done: any, value: any) {
             if (done) {
                 peer.write(JSON.stringify({ done: true, fileName: fileName }));
                 return;
             }
-            
-            peer.write(value);
-                reader.read().then((obj: any) => {
-                    handlereading(obj.done, obj.value);
-                });
+
+            // Send a chunk of data
+            peer.write(value.slice(0, CHUNK_SIZE));
+
+            // Check if there's more data
+            if (value.length > CHUNK_SIZE) {
+                console.log(value.length);
+                
+                // Wait for a short time before sending the next chunk
+                    handlereading(done, value.slice(CHUNK_SIZE));
+            } else {
+                // Continue reading the next chunk
+                readChunk();
+            }
         }
+
         
 
     }

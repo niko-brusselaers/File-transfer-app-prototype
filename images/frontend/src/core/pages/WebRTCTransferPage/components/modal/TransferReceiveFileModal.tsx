@@ -42,6 +42,7 @@ function TransferReceiveFileModal({ModalIsOpen,socket, setPeerRef,senderData}: {
 
 
     function handleReceivingData(data:any) {
+        
         if(data.toString().includes('done')) {
             setGotFile(true)
             const parsed = JSON.parse(data);

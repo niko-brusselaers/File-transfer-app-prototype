@@ -2,8 +2,8 @@
     position: absolute;
     width: 100vw;
     height: 100vh;
-    background-color: #202124;
-    opacity: 0.8;
+    background-color: #202124bd;
+    opacity: 1;
     display: flex;
     justify-content: center;
     align-items: center;
